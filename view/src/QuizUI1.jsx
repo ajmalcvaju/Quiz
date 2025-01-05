@@ -8,11 +8,13 @@ const QuizApp = () => {
   const [questionIndex, setQuestionIndex] = useState(0);
   const [currentTest, setCurrentTest] = useState({});
   const [currentQuestion, setCurrentQuestion] = useState({});
+  const [completedQuestions, setCompletedQuestions] = useState([]);
   const [completedTest, setCompletedTest] = useState([]);
   const [showExplanation, setShowExplanation] = useState(false);
   const [selectedOption, setSelectedOption] = useState("");
   const [isCorrect, setIsCorrect] = useState(null);
 
+  // Fetch quizzes on initial load
   useEffect(() => {
     const getTests = async () => {
       try {
@@ -25,22 +27,27 @@ const QuizApp = () => {
 
     getTests();
   }, []);
-  
 
+  // Select a specific test based on index
   const selectTest = (index) => {
     if (tests.length > 0 && index < tests.length) {
       const selectedTest = tests[index];
       setCurrentTest(selectedTest);
-      setQuestionIndex(0);
+      setQuestionIndex(0); // Reset question index when selecting a new test
+      setCompletedQuestions([]);
+    } else {
+      console.error("Invalid test index or tests array is empty.");
     }
   };
 
+  // Automatically select the first test when tests are loaded
   useEffect(() => {
     if (tests.length > 0) {
       selectTest(testIndex);
     }
   }, [tests, testIndex]);
 
+  // Automatically select the first question when the current test changes
   useEffect(() => {
     if (currentTest?.questions?.length > 0) {
       setCurrentQuestion(currentTest.questions[questionIndex]);
@@ -50,35 +57,13 @@ const QuizApp = () => {
   const needHelp = () => {
     setShowExplanation((prev) => !prev);
   };
-
   const checkAnswer = () => {
-    if (selectedOption === currentQuestion?.answer) {
+    if (selectedOption == currentQuestion?.answer) {
       setIsCorrect(true);
     } else {
       setIsCorrect(false);
     }
   };
-
-  const nextQuestionOrTest = () => {
-    if (questionIndex < currentTest.questions.length - 1) {
-      setQuestionIndex((prev) => prev + 1);
-    } else if (testIndex < tests.length - 1) {
-      setCompletedTest((prev) => [...prev, testIndex]);
-      setTestIndex((prev) => prev + 1);
-      setSelected(null);
-    }
-  };
-
-  const prevQuestionOrTest = () => {
-    if (questionIndex > 0) {
-      setQuestionIndex((prev) => prev - 1);
-    } else if (testIndex > 0 && questionIndex === 0) {
-      setTestIndex((prev) => prev - 1);
-      const lastTest = tests[testIndex - 1];
-      setQuestionIndex(lastTest.questions.length - 1);
-    }
-  };
-  
   return (
     <div className="min-h-screen bg-blue-500 flex items-center justify-center p-auto">
       <div className="mt-3 mb-3 bg-white w-4/5 max-w-4xl rounded-lg shadow-lg overflow-hidden">
@@ -117,9 +102,9 @@ const QuizApp = () => {
                       ? selected === index
                         ? "bg-blue-500 text-white border-blue-500"
                         : "border-gray-300 hover:bg-gray-100"
-                      : selected === index && isCorrect
+                      : option === currentQuestion?.answer
                       ? "bg-green-500 text-white border-green-500"
-                      : selected === index && !isCorrect
+                      : selected === index
                       ? "bg-red-500 text-white border-red-500"
                       : "border-gray-300"
                   }`}
@@ -132,14 +117,20 @@ const QuizApp = () => {
             {/* Navigation Buttons */}
             <div className="flex space-x-10 justify-center">
               <button
-                onClick={prevQuestionOrTest}
-                disabled={testIndex === 0 && questionIndex === 0}
-                className="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 disabled:bg-gray-100 disabled:text-gray-400"
+                onClick={() => {
+                  setSelected(false);
+                  setQuestionIndex((prev) => Math.max(0, prev - 1));
+                }}
+                className="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300"
               >
                 Prev
               </button>
               <button
-                onClick={nextQuestionOrTest}
+                onClick={() => {
+                  setQuestionIndex((prev) =>
+                    Math.min(prev + 1, currentTest.questions.length - 1)
+                  );
+                }}
                 className="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300"
               >
                 Next
@@ -149,10 +140,10 @@ const QuizApp = () => {
             {showExplanation && (
               <div
                 onClick={checkAnswer}
-                className="cursor-pointer mt-6 border border-gray-300 rounded-lg p-2"
+                className="mt-6 border border-gray-300 rounded-lg cursor-pointer p-2"
               >
                 <h3 className="text-lg font-semibold">Explanation</h3>
-                <p className="text-black mt-2">
+                <p className="text-gray-700 mt-2">
                   {currentQuestion?.explanation || "No explanation available."}
                 </p>
               </div>
@@ -175,18 +166,18 @@ const QuizApp = () => {
               {tests.map((_, index) => (
                 <button
                   key={index}
-                  // onClick={() => {
-                  //   if (!completedTest.includes(index)) {
-                  //     setTestIndex(index);
-                  //   }
-                  // }}
-                  disabled={completedTest.includes(index)}
+                  onClick={() => {
+                    if (!completedTest.includes(index)) {
+                      setTestIndex(index);
+                    }
+                  }}
+                  disabled={completedTest.includes(index)} // Disable button if test is completed
                   className={`w-10 h-10 rounded-full ${
                     index === testIndex
                       ? "bg-red-300 text-white"
                       : completedTest.includes(index)
-                      ? "bg-blue-300 text-white cursor-not-allowed"
-                      : "bg-gray-200 hover:bg-gray-300 cursor-not-allowed"
+                      ? "bg-blue-300 text-white cursor-not-allowed" // Style for completed tests
+                      : "bg-gray-200 hover:bg-gray-300"
                   }`}
                 >
                   {index + 1}
