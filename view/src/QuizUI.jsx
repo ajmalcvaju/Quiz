@@ -95,10 +95,13 @@ const QuizApp = () => {
       setQuestionIndex((prev) => prev - 1);
       setSelected(null);
     } else if (testIndex > 0 && questionIndex === 0) {
-      setTestIndex((prev) => prev - 1);
       const lastTest = tests[testIndex - 1];
-      setSelected(null);
       setQuestionIndex(lastTest.questions.length - 1);
+      setTestIndex((prev) => prev - 1);
+      
+      console.log(lastTest.questions.length)
+      
+      setSelected(null);
     }
   };
 
