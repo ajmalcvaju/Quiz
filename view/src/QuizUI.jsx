@@ -40,7 +40,6 @@ const QuizApp = () => {
     localStorage.setItem('completedTest', JSON.stringify(newCompletedTest));
   }, [testIndex]);
   
-
   useEffect(() => {
     localStorage.setItem('questionIndex', questionIndex);
   }, [questionIndex]);
@@ -80,6 +79,7 @@ const QuizApp = () => {
   const nextQuestionOrTest = () => {
     if (questionIndex < currentTest.questions.length - 1) {
       setQuestionIndex((prev) => prev + 1);
+      setSelected(null);
     } else if (testIndex < tests.length - 1) {
       setCompletedTest((prev) => [...prev, testIndex]);
       setTestIndex((prev) => prev + 1);
@@ -90,9 +90,11 @@ const QuizApp = () => {
   const prevQuestionOrTest = () => {
     if (questionIndex > 0) {
       setQuestionIndex((prev) => prev - 1);
+      setSelected(null);
     } else if (testIndex > 0 && questionIndex === 0) {
       setTestIndex((prev) => prev - 1);
       const lastTest = tests[testIndex - 1];
+      setSelected(null);
       setQuestionIndex(lastTest.questions.length - 1);
     }
   };
