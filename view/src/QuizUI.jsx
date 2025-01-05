@@ -11,11 +11,11 @@ const QuizApp = () => {
   const [selectedOption, setSelectedOption] = useState("");
   const [isCorrect, setIsCorrect] = useState(null);
   const [testIndex, setTestIndex] = useState(() => {
-    const storedTestIndex = localStorage.getItem('testIndex');
+    const storedTestIndex = localStorage.getItem("testIndex");
     return storedTestIndex ? parseInt(storedTestIndex, 10) : 0;
   });
   const [questionIndex, setQuestionIndex] = useState(() => {
-    const storedQuestionIndex = localStorage.getItem('questionIndex');
+    const storedQuestionIndex = localStorage.getItem("questionIndex");
     return storedQuestionIndex ? parseInt(storedQuestionIndex, 10) : 0;
   });
 
@@ -32,16 +32,19 @@ const QuizApp = () => {
     getTests();
   }, []);
   useEffect(() => {
-    localStorage.setItem('testIndex', testIndex);
+    localStorage.setItem("testIndex", testIndex);
   }, [testIndex]);
   useEffect(() => {
-    const newCompletedTest = Array.from({ length: testIndex }, (_, index) => index);
+    const newCompletedTest = Array.from(
+      { length: testIndex },
+      (_, index) => index
+    );
     setCompletedTest(newCompletedTest);
-    localStorage.setItem('completedTest', JSON.stringify(newCompletedTest));
+    localStorage.setItem("completedTest", JSON.stringify(newCompletedTest));
   }, [testIndex]);
-  
+
   useEffect(() => {
-    localStorage.setItem('questionIndex', questionIndex);
+    localStorage.setItem("questionIndex", questionIndex);
   }, [questionIndex]);
 
   const selectTest = (index) => {
@@ -98,7 +101,7 @@ const QuizApp = () => {
       setQuestionIndex(lastTest.questions.length - 1);
     }
   };
-  
+
   return (
     <div className="min-h-screen bg-blue-500 flex items-center justify-center p-auto">
       <div className="mt-3 mb-3 bg-white w-4/5 max-w-4xl rounded-lg shadow-lg overflow-hidden">

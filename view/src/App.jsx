@@ -1,12 +1,11 @@
-import QuizUI from './QuizUI'
+import QuizUI from "./QuizUI";
 
 function App() {
-
   return (
-   <>
-   <QuizUI/>
-   </>
-  )
+    <>
+      <QuizUI />
+    </>
+  );
 }
 
-export default App
+export default App;
