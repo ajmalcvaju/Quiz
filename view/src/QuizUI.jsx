@@ -1,29 +1,71 @@
-"use client";
-import axio from "axios";
+import axios from "axios";
 import { useEffect, useState } from "react";
 
 const QuizApp = () => {
-  useEffect(() => {
-    axio.get("http://localhost:5000/api/quizzes").then((response) => {
-      console.log(response.data);
-    });
-  }, []);
   const [selected, setSelected] = useState(null);
-  const [currentQuestion, setCurrentQuestion] = useState(5);
-  const [completedQuestions, setCompletedQuestions] = useState([0, 1, 2, 3, 4]);
-  const options = [
-    { id: 1, text: "120 m" },
-    { id: 2, text: "240 m" },
-    { id: 3, text: "300 m" },
-    { id: 4, text: "None of these" },
-  ];
+  const [tests, setTests] = useState([]);
+  const [testIndex, setTestIndex] = useState(0);
+  const [questionIndex, setQuestionIndex] = useState(0);
+  const [currentTest, setCurrentTest] = useState({});
+  const [currentQuestion, setCurrentQuestion] = useState({});
+  const [completedQuestions, setCompletedQuestions] = useState([]);
+  const [completedTest, setCompletedTest] = useState([1, 2, 3]);
+  const [showExplanation, setShowExplanation] = useState(false);
 
+  // Fetch quizzes on initial load
+  useEffect(() => {
+    const getTests = async () => {
+      try {
+        const response = await axios.get("http://localhost:5000/api/quizzes");
+        setTests(response.data);
+      } catch (error) {
+        console.error("Error fetching quizzes:", error);
+      }
+    };
+
+    getTests();
+  }, []);
+
+  // Select a specific test based on index
+  const selectTest = (index) => {
+    if (tests.length > 0 && index < tests.length) {
+      const selectedTest = tests[index];
+      setCurrentTest(selectedTest);
+      setQuestionIndex(0); // Reset question index when selecting a new test
+      setCompletedQuestions([]);
+    } else {
+      console.error("Invalid test index or tests array is empty.");
+    }
+  };
+
+  // Automatically select the first test when tests are loaded
+  useEffect(() => {
+    if (tests.length > 0) {
+      selectTest(testIndex);
+    }
+  }, [tests, testIndex]);
+
+  // Automatically select the first question when the current test changes
+  useEffect(() => {
+    if (currentTest?.questions?.length > 0) {
+      setCurrentQuestion(currentTest.questions[questionIndex]);
+    }
+  }, [currentTest, questionIndex]);
+
+  const needHelp = () => {
+    setShowExplanation((prev) => !prev);
+  };
+ const checkAnswer=()=>{
+  
+ }
   return (
     <div className="min-h-screen bg-blue-500 flex items-center justify-center p-auto">
       <div className="mt-3 mb-3 bg-white w-4/5 max-w-4xl rounded-lg shadow-lg overflow-hidden">
         {/* Header */}
         <div className="text-center py-4 border-b">
-          <h1 className="text-2xl font-semibold">Quiz Title</h1>
+          <h1 className="text-2xl font-semibold">
+            {currentTest.title || "Quiz Title"}
+          </h1>
         </div>
 
         <div className="flex flex-col md:flex-row">
@@ -31,70 +73,87 @@ const QuizApp = () => {
           <div className="flex-1 p-4">
             {/* Question */}
             <div className="mb-4 border border-blue-600 p-4 rounded-lg">
-              <h2 className="text-md font-semibold mb-2">Question 1</h2>
+              <h2 className="text-md font-semibold mb-2">
+                Question {questionIndex + 1}
+              </h2>
               <p className="text-black text-sm">
-                A train passes a station platform in 36 seconds and a man
-                standing on the platform in 20 seconds. If the speed of the
-                train is 54 km/hr, what is the length of the platform?
+                {currentQuestion?.question || "No question available"}
               </p>
             </div>
 
             {/* Options */}
             <div className="space-y-2 mb-4">
-              {options.map(({ id, text }) => (
+              {currentQuestion?.options?.map((option, index) => (
                 <label
-                  key={id}
-                  onClick={() => setSelected(id)}
+                  key={index}
+                  onClick={() => setSelected(index)}
                   className={`block border p-2 rounded-lg cursor-pointer ${
-                    selected === id
+                    selected === index
                       ? "bg-blue-500 text-white border-blue-500"
                       : "border-gray-300 hover:bg-gray-100"
                   }`}
                 >
-                  {text}
+                  {option}
                 </label>
               ))}
             </div>
+
             {/* Navigation Buttons */}
             <div className="flex space-x-10 justify-center">
-              <button className="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300">
+              <button
+                onClick={() => {
+                  setSelected(false);
+                  setQuestionIndex((prev) => Math.max(0, prev - 1));
+                }}
+                className="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300"
+              >
                 Prev
               </button>
-              <button className="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300">
+              <button
+                onClick={() => {
+                  setQuestionIndex((prev) =>
+                    Math.min(prev + 1, currentTest.questions.length - 1)
+                  );
+                }}
+                className="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300"
+              >
                 Next
               </button>
             </div>
 
-            {/* Explanation */}
-            <div className="mt-6">
-              <h3 className="text-lg font-semibold">Explanation</h3>
-              <p className="text-gray-700 mt-2">
-                A train passes a station platform in 36 seconds and a man
-                standing on the platform in 20 seconds. If the speed of the
-                train is 54 km/hr, what is the length of the platform?
-              </p>
-            </div>
+            {showExplanation && (
+              <div onClick={checkAnswer} className="mt-6 border border-gray-300 rounded-lg cursor-pointer p-2">
+                <h3 className="text-lg font-semibold">Explanation</h3>
+                <p className="text-gray-700 mt-2">
+                  {currentQuestion?.explanation || "No explanation available."}
+                </p>
+              </div>
+            )}
           </div>
 
           {/* Sidebar */}
           <div className="w-full md:w-1/3 bg-gray-100 border-l p-4">
             <div className="text-center mb-4 flex justify-between items-center">
-              <h3 className="text-lg font-semibold">Question 1/8</h3>
-              <a href="#" className="text-black hover:underline">
+              <h3 className="text-lg font-semibold">
+                Question {questionIndex + 1}/
+                {currentTest.questions?.length || "0"}
+              </h3>
+              <a onClick={needHelp} className="text-black hover:cursor-pointer">
                 Need Help?
               </a>
             </div>
             {/* Question Navigator */}
             <div className="grid grid-cols-5 gap-2">
-              {Array.from({ length: 20 }, (_, index) => (
+              {tests.map((_, index) => (
                 <button
                   key={index}
+                  onClick={() => setTestIndex(index)}
                   className={`w-10 h-10 rounded-full ${
-                    index === currentQuestion
-                      ? "bg-red-300 text-white" // Light-red for the current question
-                      : completedQuestions.includes(index)
-                      ? "bg-blue-300 text-white" // Light-blue for completed questions
-                      : "bg-gray-200 hover:bg-gray-300" // Default gray
+                    index === testIndex
+                      ? "bg-red-300 text-white"
+                      : completedTest.includes(index)
+                      ? "bg-blue-300 text-white"
+                      : "bg-gray-200 hover:bg-gray-300"
                   }`}
                 >
                   {index + 1}
