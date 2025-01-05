@@ -83,10 +83,12 @@ const QuizApp = () => {
     if (questionIndex < currentTest.questions.length - 1) {
       setQuestionIndex((prev) => prev + 1);
       setSelected(null);
+      setShowExplanation(false)
     } else if (testIndex < tests.length - 1) {
       setCompletedTest((prev) => [...prev, testIndex]);
       setTestIndex((prev) => prev + 1);
       setSelected(null);
+      setShowExplanation(false)
     }
   };
 
@@ -94,13 +96,13 @@ const QuizApp = () => {
     if (questionIndex > 0) {
       setQuestionIndex((prev) => prev - 1);
       setSelected(null);
+      setShowExplanation(false)
     } else if (testIndex > 0 && questionIndex === 0) {
       const lastTest = tests[testIndex - 1];
       setQuestionIndex(lastTest.questions.length - 1);
       setTestIndex((prev) => prev - 1);
-      
       console.log(lastTest.questions.length)
-      
+      setShowExplanation(false)
       setSelected(null);
     }
   };
@@ -147,7 +149,7 @@ const QuizApp = () => {
                       ? "bg-green-500 text-white border-green-500"
                       : selected === index && !isCorrect
                       ? "bg-red-500 text-white border-red-500"
-                      : "border-gray-300"
+                      : "shadow-lg"
                   }`}
                 >
                   {option}
@@ -175,7 +177,7 @@ const QuizApp = () => {
             {showExplanation && (
               <div
                 onClick={checkAnswer}
-                className="cursor-pointer mt-6 border border-gray-300 rounded-lg p-2"
+                className="cursor-pointer mt-6 border border-gray-300 shadow-lg rounded-lg p-2"
               >
                 <h3 className="text-lg font-semibold">Explanation</h3>
                 <p className="text-black mt-2">
