@@ -1,4 +1,3 @@
-const express = require('express');
 const Quiz = require('../models/quizModel');
 
 const getTests = async (req, res) => {
@@ -6,7 +5,7 @@ const getTests = async (req, res) => {
         const quizzes = await Quiz.find();
         res.json(quizzes);
     } catch (err) {
-        res.status(500).json({ message: err.message });
+        next(err);
     }
 };
 
@@ -14,11 +13,13 @@ const getTest = async (req, res) => {
     try {
         const quiz = await Quiz.findById(req.params.id);
         if (!quiz) {
-            return res.status(404).json({ message: 'Quiz not found' });
+            const error = new Error('Quiz not found');
+            error.status = 404;
+            return next(error);
         }
         res.json(quiz);
     } catch (err) {
-        res.status(500).json({ message: err.message });
+        next(err);
     }
 };
 

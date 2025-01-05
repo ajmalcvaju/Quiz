@@ -4,14 +4,20 @@ import { useEffect, useState } from "react";
 const QuizApp = () => {
   const [selected, setSelected] = useState(null);
   const [tests, setTests] = useState([]);
-  const [testIndex, setTestIndex] = useState(0);
-  const [questionIndex, setQuestionIndex] = useState(0);
   const [currentTest, setCurrentTest] = useState({});
   const [currentQuestion, setCurrentQuestion] = useState({});
   const [completedTest, setCompletedTest] = useState([]);
   const [showExplanation, setShowExplanation] = useState(false);
   const [selectedOption, setSelectedOption] = useState("");
   const [isCorrect, setIsCorrect] = useState(null);
+  const [testIndex, setTestIndex] = useState(() => {
+    const storedTestIndex = localStorage.getItem('testIndex');
+    return storedTestIndex ? parseInt(storedTestIndex, 10) : 0;
+  });
+  const [questionIndex, setQuestionIndex] = useState(() => {
+    const storedQuestionIndex = localStorage.getItem('questionIndex');
+    return storedQuestionIndex ? parseInt(storedQuestionIndex, 10) : 0;
+  });
 
   useEffect(() => {
     const getTests = async () => {
@@ -25,7 +31,19 @@ const QuizApp = () => {
 
     getTests();
   }, []);
+  useEffect(() => {
+    localStorage.setItem('testIndex', testIndex);
+  }, [testIndex]);
+  useEffect(() => {
+    const newCompletedTest = Array.from({ length: testIndex }, (_, index) => index);
+    setCompletedTest(newCompletedTest);
+    localStorage.setItem('completedTest', JSON.stringify(newCompletedTest));
+  }, [testIndex]);
   
+
+  useEffect(() => {
+    localStorage.setItem('questionIndex', questionIndex);
+  }, [questionIndex]);
 
   const selectTest = (index) => {
     if (tests.length > 0 && index < tests.length) {
