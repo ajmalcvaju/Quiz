@@ -1,6 +1,6 @@
 const Quiz = require("../models/quizModel");
 
-const getTests = async (req, res) => {
+const getTests = async (req, res,next) => {
   try {
     const quizzes = await Quiz.find();
     res.json(quizzes);
@@ -9,7 +9,7 @@ const getTests = async (req, res) => {
   }
 };
 
-const getTest = async (req, res) => {
+const getTest = async (req, res,next) => {
   try {
     const quiz = await Quiz.findById(req.params.id);
     if (!quiz) {
