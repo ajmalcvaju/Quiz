@@ -144,12 +144,12 @@ const QuizApp = () => {
                     isCorrect === null
                       ? selected === index
                         ? "bg-blue-500 text-white border-blue-500"
-                        : "border-gray-300 hover:bg-gray-100"
+                        : "shadow-md shadow-gray-200 hover:bg-gray-100"
                       : selected === index && isCorrect
                       ? "bg-green-500 text-white border-green-500"
                       : selected === index && !isCorrect
                       ? "bg-red-500 text-white border-red-500"
-                      : "shadow-lg"
+                      : "border-gray-300"
                   }`}
                 >
                   {option}
@@ -177,7 +177,7 @@ const QuizApp = () => {
             {showExplanation && (
               <div
                 onClick={checkAnswer}
-                className="cursor-pointer mt-6 border border-gray-300 shadow-lg rounded-lg p-2"
+                className="cursor-pointer mt-6 border shadow-md shadow-gray-300 rounded-lg p-2"
               >
                 <h3 className="text-lg font-semibold">Explanation</h3>
                 <p className="text-black mt-2">
@@ -211,10 +211,10 @@ const QuizApp = () => {
                   disabled={completedTest.includes(index)}
                   className={`w-10 h-10 rounded-full ${
                     index === testIndex
-                      ? "bg-red-300 text-white"
+                      ? "bg-red-300 text-white font-semibold"
                       : completedTest.includes(index)
-                      ? "bg-blue-300 text-white cursor-not-allowed"
-                      : "bg-gray-200 hover:bg-gray-300 cursor-not-allowed"
+                      ? "bg-blue-300 font-semibold text-white cursor-not-allowed"
+                      : "bg-gray-200 font-semibold hover:bg-gray-300 cursor-not-allowed"
                   }`}
                 >
                   {index + 1}
