@@ -51,7 +51,7 @@ const QuizApp = () => {
     if (tests.length > 0 && index < tests.length) {
       const selectedTest = tests[index];
       setCurrentTest(selectedTest);
-      setQuestionIndex(0);
+      // setQuestionIndex(0);
     }
   };
 
@@ -86,6 +86,7 @@ const QuizApp = () => {
       setShowExplanation(false)
     } else if (testIndex < tests.length - 1) {
       setCompletedTest((prev) => [...prev, testIndex]);
+      setQuestionIndex(0);
       setTestIndex((prev) => prev + 1);
       setSelected(null);
       setShowExplanation(false)
@@ -149,7 +150,7 @@ const QuizApp = () => {
                       ? "bg-green-500 text-white border-green-500"
                       : selected === index && !isCorrect
                       ? "bg-red-500 text-white border-red-500"
-                      : "border-gray-300"
+                      : "shadow-md shadow-gray-200"
                   }`}
                 >
                   {option}
