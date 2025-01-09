@@ -23,7 +23,7 @@ const QuizApp = () => {
     const getTests = async () => {
       try {
         const response = await axios.get("http://localhost:5000/api/quizzes");
-        setTests(response.data);
+        setTests(response.data.data);
       } catch (error) {
         console.error("Error fetching quizzes:", error);
       }
